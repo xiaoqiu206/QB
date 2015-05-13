@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        #main {
+            background-color: aliceblue;
+            width: 200px;
+            margin: 200px auto;
+        }
+        .input1 {
+            margin: 10px;
+            height: 20px;
+        }
+        .btn {
+            margin: 10px;
+            width: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <form action="/login" method='get'>
+            <input class='input1' type="text" name='username' placeholder="输入用户名" value='{{ username }}'>
+            <br>
+            <input class='input1' type="password" name="password" placeholder='请输入密码'>
+            <br>
+            <input class='btn' type="submit" value="登录">{{ msg }}
+        </form>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <title>列表</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        .btn {
+            margin: 10px;
+            height: 35px;
+            width: 100px;
+        }
+        table {
+            text-align: center;
+            align: center;
+            margin: 10px;
+            border: solid #add9c0;
+            border-width: 1px 0px 0px 1px;
+        }
+        td,
+        th {
+            border: solid #add9c0;
+            border-width: 0px 1px 1px 0px;
+            padding: 10px 10px;
+        }
+    </style>
+    <script>
+        function copyData(obj) {
+            // console.log(obj);
+            var tr = obj.parentNode.parentNode;
+            txt = tr.children[8].innerHTML;
+            // console.log(data);
+            if (window.clipboardData) {
+                window.clipboardData.setData("Text", txt);
+                alert(txt + '  已经复制到剪贴板');
+            }
+        }
+
+        function handle(obj, num) {
+            var tr = obj.parentNode.parentNode;
+            // var account = tr.children[4].innerHTML;
+            var order_id = tr.children[0].innerHTML;
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var data = xhr.responseText;
+                    if (data == 'success' && num == 2) { // 发送处理中,返回成功
+                        obj.disabled = true;
+                        obj.parentNode.getElementsByTagName('input')[1].disabled = false;
+                        obj.parentNode.getElementsByTagName('input')[2].disabled = false;
+                        tr.children[11].innerHTML = '处理中';
+                        copyData(obj);
+                    } else if (data == 'success' && num == 1) { // 发送处理充值成功
+                        tr.parentNode.removeChild(tr);
+                    } else if (data == 'success' && num == 0) { // 发送充值失败
+                        tr.parentNode.removeChild(tr);
+                    } else if (data == 'fail') {
+                        tr.children[11].innerHTML = '处理失败';
+                    }
+                }
+            }
+            url = '/handle_order?' + '&state=' + num + '&order_id=' + order_id;
+            xhr.open('GET', url, true);
+            if (num == 0) {
+                if (window.confirm('你确定是充值失败吗?')) {
+                    xhr.send();
+                }
+            } else{
+                xhr.send();
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="main">
+        <table border='1' cellpadding='0' cellspacing='0'>
+            <tbody>
+                <tr>
+                    <th>订单号</th>
+                    <th>商品编号</th>
+                    <th>充值区域名称</th>
+                    <!-- <th>充值方式</th> -->
+                    <th>游戏类型名称</th>
+                    <th>订单时间</th>
+                    <th>进货商家编号</th>
+                    <th>商品名称</th>
+                    <th>商品面值</th>
+                    <th>充值账号</th>
+                    <th>充值账号类型</th>
+                    <th>购买数量</th>
+                    <th>订单状态</th>
+                    <th>操作</th>
+                </tr>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.order_id|default_if_none:"" }}</td>
+                    <td>{{ order.product_id|default_if_none:"" }}</td>
+                    <td>{{ order.area_name|default_if_none:"" }}</td>
+                    <!--   <td>{{ order.recharge_mode|default_if_none:"" }}</td> -->
+                    <td>{{ order.game_name|default_if_none:"" }}</td>
+                    <td>{{ order.deal_date_time|default_if_none:"" }}</td>
+                    <td>{{ order.stock_merchant_id|default_if_none:"" }}</td>
+                    <td>{{ order.product_name|default_if_none:"" }}</td>
+                    <td>{{ order.product_par_value|default_if_none:"" }}</td>
+                    <td>{{ order.target_account|default_if_none:"" }}</td>
+                    <td>{{ order.target_account_type|default_if_none:"" }}</td>
+                    <td>
+                        <h3>{{ order.buy_amount|default_if_none:"" }}</h3>
+                    </td>
+                    <td>{% if order.order_state == '4' %} 未处理 {% else %} 处理中 {% endif %}</td>
+                    <td>
+                        <input class='btn' onclick='handle(this,2);' type="button" value="处理" {% if order.order_state == '2' %} disabled {% endif %}/>
+                        <input class='btn' onclick='handle(this,1);' type="button" value="充值成功" {% if order.order_state == '4' %} disabled {% endif %} />
+                        <input onclick='handle(this,0)' type="button" value='充值失败' {% if order.order_state == '4' %} disabled {% endif %} />
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
