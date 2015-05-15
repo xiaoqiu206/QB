@@ -33,7 +33,7 @@
         function copyData(obj) {
             // console.log(obj);
             var tr = obj.parentNode.parentNode;
-            txt = tr.children[8].innerHTML;
+            txt = tr.children[7].innerHTML;
             // console.log(data);
             if (window.clipboardData) {
                 window.clipboardData.setData("Text", txt);
@@ -53,14 +53,16 @@
                         obj.disabled = true;
                         obj.parentNode.getElementsByTagName('input')[1].disabled = false;
                         obj.parentNode.getElementsByTagName('input')[2].disabled = false;
-                        tr.children[11].innerHTML = '处理中';
+                        tr.style.background = 'gray';
+                        tr.children[10].innerHTML = '处理中';
                         copyData(obj);
                     } else if (data == 'success' && num == 1) { // 发送处理充值成功
-                        tr.parentNode.removeChild(tr);
+                        history.go(0);
+                    	// tr.parentNode.removeChild(tr);
                     } else if (data == 'success' && num == 0) { // 发送充值失败
                         tr.parentNode.removeChild(tr);
                     } else if (data == 'fail') {
-                        tr.children[11].innerHTML = '处理失败';
+                        tr.children[10].innerHTML = '处理失败';
                     }
                 }
             }
@@ -74,10 +76,18 @@
                 xhr.send();
             }
         }
+        function colorSep(){  // 重点部分颜色标记
+       document.body.innerHTML = document.body.innerHTML.split('超级会员').join("<b style='color:blue;'>超级会员</b>");
+            var trs = document.getElementsByTagName('tr');
+            for(var n=0;n<trs.length;n++){
+                if(trs[n].children[10].innerHTML == '处理中')
+                trs[n].style.background = 'gray';
+            }
+        }
     </script>
 </head>
 
-<body>
+<body onload='colorSep();'>
     <div id="main">
         <table border='1' cellpadding='0' cellspacing='0'>
             <tbody>
@@ -90,7 +100,7 @@
                     <th>订单时间</th>
                     <th>进货商家编号</th>
                     <th>商品名称</th>
-                    <th>商品面值</th>
+<!--                    <th>商品面值</th>-->
                     <th>充值账号</th>
                     <th>充值账号类型</th>
                     <th>购买数量</th>
@@ -107,13 +117,13 @@
                     <td>{{ order.deal_date_time|default_if_none:"" }}</td>
                     <td>{{ order.stock_merchant_id|default_if_none:"" }}</td>
                     <td>{{ order.product_name|default_if_none:"" }}</td>
-                    <td>{{ order.product_par_value|default_if_none:"" }}</td>
+<!--                    <td>{{ order.product_par_value|default_if_none:"" }}</td>-->
                     <td>{{ order.target_account|default_if_none:"" }}</td>
                     <td>{{ order.target_account_type|default_if_none:"" }}</td>
                     <td>
-                        <h3>{{ order.buy_amount|default_if_none:"" }}</h3>
+                        <h1>{{ order.buy_amount|default_if_none:"" }}</h1>
                     </td>
-                    <td>{% if order.order_state == '4' %} 未处理 {% else %} 处理中 {% endif %}</td>
+                    <td>{% if order.order_state == '4' %} 未处理 {% else %}处理中{% endif %}</td>
                     <td>
                         <input class='btn' onclick='handle(this,2);' type="button" value="处理" {% if order.order_state == '2' %} disabled {% endif %}/>
                         <input class='btn' onclick='handle(this,1);' type="button" value="充值成功" {% if order.order_state == '4' %} disabled {% endif %} />
