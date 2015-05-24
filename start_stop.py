@@ -35,12 +35,12 @@ def stop_ps():
 
 def start_ps():
     ssh = get_sshcon()
-    command = 'cd /home/qiu/QB/;nohup python cron.py&'
+    command = 'cd /home/qiu/QB/;nohup python cron.py &'
 #     command = 'cd /home/qiu/QB/;nohup python cron.py &'
     stdin, stdout, stderr = ssh.exec_command(command)
-    print 'exec command'
     stdin.write('\n')
     stdin.flush()
+    ssh.close()
     print u'成功开启!'.encode('GBK')
 
 
