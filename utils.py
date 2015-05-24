@@ -105,5 +105,10 @@ def xml2db():
                     deal_date_time=order.find('deal-date-time').text,
                     order_state='4'
                 )
-                model_order.save()
-                print 'save an order'
+                try:
+                    model_order.save()
+                except Exception,e:
+                    print 'insert data to database error',e
+                else:
+                    print 'save an order'
+                
