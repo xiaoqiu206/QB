@@ -6,8 +6,9 @@ Created on 2015年5月11日
 '''
 import time
 import utils
+import thread
 
 
 while 1:
-    utils.xml2db()
-    time.sleep(15)
+    thread.start_new_thread(utils.xml2db, ())
+    time.sleep(5)
