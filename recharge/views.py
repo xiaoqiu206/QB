@@ -3,11 +3,12 @@ from django.shortcuts import render_to_response, HttpResponseRedirect
 from models import User, Order
 from django.http import HttpResponse
 from recharge import utils
-import xmltodict
+from recharge.tasks import add
 
 
 def index(request):
-    return render_to_response('index.html', {'username':'', 'msg':''})
+    add.delay(15, 20)
+    return render_to_response('index.html', {'username': '', 'msg': ''})
 
 
 def login(request):
@@ -19,7 +20,7 @@ def login(request):
         request.session['username'] = users[0].username
         return HttpResponseRedirect('/list')
     else:
-        return render_to_response('index.html', {'username':username, 'msg':u'用户名或密码错误'})
+        return render_to_response('index.html', {'username': username, 'msg': u'用户名或密码错误'})
 
 
 def rechargeList(request):
@@ -28,13 +29,14 @@ def rechargeList(request):
     else:
         username = request.session['username']  # 当前登录的用户名
         user = User.objects.get(username=username)
-        
-        handling_orders = Order.objects.filter(order_state='2', user=user)  # 当前用户的处理中订单
+
+        handling_orders = Order.objects.filter(
+            order_state='2', user=user)  # 当前用户的处理中订单
         unhandle_orders = Order.objects.filter(order_state='4')  # 未处理订单
         orders = handling_orders | unhandle_orders
-        return render_to_response('list.html', {'orders' :orders})
-        
-        
+        return render_to_response('list.html', {'orders': orders})
+
+
 def handle_order(request):
     if 'username' not in request.session:  # 如果没有登录,就返回登录界面
         return HttpResponseRedirect('/')
@@ -49,14 +51,16 @@ def handle_order(request):
         else:
             order.user = user
             order.save()
-    
+
     result = utils.handle_orders_data(order_id, state)
     print result
-    if not result and xmltodict.parse(result)['result']['state'] == 1:  # 如果有返回而且表示处理成功
+    # 如果有返回而且表示处理成功
+    if not result and xmltodict.parse(result)['result']['state'] == 1:
         order.order_state = state
         order.save()
         return HttpResponse('success')
-    elif not result and xmltodict.parse(result)['result']['state'] == 0:  # 如果有返回而且表示失败 
+    # 如果有返回而且表示失败
+    elif not result and xmltodict.parse(result)['result']['state'] == 0:
         return HttpResponse('fail')
     else:
         order.order_state = state

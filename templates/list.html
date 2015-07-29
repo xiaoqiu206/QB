@@ -80,8 +80,10 @@
        document.body.innerHTML = document.body.innerHTML.split('超级会员').join("<b style='color:blue;'>超级会员</b>");
             var trs = document.getElementsByTagName('tr');
             for(var n=0;n<trs.length;n++){
-                if(trs[n].children[10].innerHTML == '处理中')
+                if(trs[n].children[10].innerHTML == '处理中'){
                 trs[n].style.background = 'gray';
+                }
+                
             }
         }
     </script>
@@ -121,7 +123,11 @@
                     <td>{{ order.target_account|default_if_none:"" }}</td>
                     <td>{{ order.target_account_type|default_if_none:"" }}</td>
                     <td>
-                        <h1>{{ order.buy_amount|default_if_none:"" }}</h1>
+                        {% if '超级' in order.product_name %}
+                                <h1 style='color:blue;'>{{ order.buy_amount|default_if_none:"" }}</h1>
+                            {% else %}
+                                <h1>{{ order.buy_amount|default_if_none:"" }}</h1>
+                        {% endif %}
                     </td>
                     <td>{% if order.order_state == '4' %} 未处理 {% else %}处理中{% endif %}</td>
                     <td>

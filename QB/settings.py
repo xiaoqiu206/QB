@@ -1,12 +1,20 @@
+#coding=utf-8
 # Django settings for QB project.
 from django.conf.global_settings import SESSION_EXPIRE_AT_BROWSER_CLOSE
+
+
+# celery的使用
+import djcelery
+djcelery.setup_loader()
+BROKER_URL = 'django://'
+##################
+
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 ###########
 import os
 PROJECT_PATH = os.path.dirname(os.path.dirname(__file__))
 ###########
-
 
 
 DEBUG = True
@@ -31,11 +39,14 @@ DATABASES = {
 '''
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(PROJECT_PATH, 'sqlite.db'),  # Or path to database file if using sqlite3.
+        # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.sqlite3',
+        # Or path to database file if using sqlite3.
+        'NAME': os.path.join(PROJECT_PATH, 'sqlite.db'),
         'USER': '',  # Not used with sqlite3.
         'PASSWORD': '',  # Not used with sqlite3.
-        'HOST': '',  # Set to empty string for localhost. Not used with sqlite3.
+        # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': '',
         'PORT': '',  # Set to empty string for default. Not used with sqlite3.
     }
 }
@@ -98,7 +109,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -108,7 +119,7 @@ SECRET_KEY = 'r^nh40xhzd459!o1lku*%-^zlotoo9b6-+41u@@&amp;yd-2%lur$$'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    #     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -145,6 +156,8 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'recharge',
+    'djcelery',
+    'kombu.transport.django'
 )
 
 # A sample logging configuration. The only tangible logging
